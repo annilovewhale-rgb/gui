@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深渊测试丨你的绝对占有欲与控制欲指数</title>
+<style>
+  :root{
+    --main-blue:#cc0000;
+    --main-blue-dark:#880000;
+    --bg-grey:#050505;
+    --card-bg:#121212;
+    --text-dark:#ff3333;
+    --text-grey:#aa0000;
+    --border-grey:#330000;
+    --danger:#ff0000;
+    --warn-bg:#220000;
+    --warn-border:#550000;
+    --success:#cc0000;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Microsoft YaHei","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    background:var(--bg-grey);
+    color:var(--text-dark);
+    padding-bottom:80px;
+  }
+  #progressBar{
+    position:sticky;
+    top:0;
+    left:0;
+    width:100%;
+    height:6px;
+    background:#220000;
+    z-index:999;
+  }
+  #progressFill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--main-blue),#ff0000);
+    transition:width .25s ease;
+  }
+  header.top{
+    background:linear-gradient(135deg,var(--main-blue-dark),#330000);
+    color:#ffcccc;
+    padding:34px 20px 46px;
+    text-align:center;
+    position:relative;
+  }
+  header.top h1{
+    margin:0 0 10px;
+    font-size:24px;
+    letter-spacing:1px;
+    color:#ff0000;
+    text-shadow: 0 0 10px rgba(255,0,0,0.5);
+  }
+  header.top p{
+    margin:4px auto;
+    max-width:560px;
+    font-size:14px;
+    line-height:1.7;
+    opacity:.92;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    margin-top:14px;
+    font-size:12px;
+    flex-wrap:wrap;
+  }
+  .meta-row span{
+    background:rgba(255,0,0,.18);
+    padding:4px 10px;
+    border-radius:20px;
+    border: 1px solid #550000;
+  }
+
+  .container{
+    max-width:680px;
+    margin:-26px auto 0;
+    padding:0 16px;
+  }
+
+  .nickname-card{
+    background:var(--card-bg);
+    border-radius:12px;
+    padding:18px 20px;
+    box-shadow:0 6px 18px rgba(255,0,0,.05);
+    margin-bottom:18px;
+    border: 1px solid var(--border-grey);
+  }
+  .nickname-card label{
+    font-size:13px;
+    color:var(--text-grey);
+    display:block;
+    margin-bottom:8px;
+  }
+  .nickname-card input{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--border-grey);
+    background: #000;
+    color: #ff3333;
+    border-radius:8px;
+    font-size:14px;
+    outline:none;
+  }
+  .nickname-card input:focus{
+    border-color:var(--main-blue);
+    box-shadow: 0 0 8px rgba(255,0,0,0.3);
+  }
+  .live-score-tip{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--text-dark);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .live-score-tip b{font-size:15px; color:#ff0000;}
+
+  .q-card{
+    background:var(--card-bg);
+    border-radius:12px;
+    padding:18px 18px 14px;
+    margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,.5);
+    border:1px solid var(--border-grey);
+    transition:border-color .2s;
+  }
+  .q-card.answered{
+    border-color:#550000;
+  }
+  .q-card .cat-tag{
+    display:inline-block;
+    font-size:11px;
+    color:#ff6666;
+    background:#2a0000;
+    padding:2px 8px;
+    border-radius:10px;
+    margin-bottom:8px;
+    cursor:help;
+    position:relative;
+  }
+  .q-card .cat-tag .tooltip{
+    display:none;
+    position:absolute;
+    top:120%;
+    left:0;
+    background:#ff0000;
+    color:#000;
+    font-size:11px;
+    padding:6px 9px;
+    border-radius:6px;
+    width:200px;
+    line-height:1.5;
+    z-index:20;
+    box-shadow:0 4px 10px rgba(255,0,0,.2);
+  }
+  .q-text{
+    font-size:15px;
+    font-weight:600;
+    line-height:1.6;
+    margin-bottom:12px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .option{
+    border:1px solid var(--border-grey);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13.5px;
+    cursor:pointer;
+    position:relative;
+    padding-left:36px;
+    transition:background .15s, border-color .15s;
+    background:#0a0a0a;
+    color: #ff3333;
+  }
+  .option:hover{
+    background:#1a0000;
+    border-color:#660000;
+  }
+  .option::before{
+    content:"";
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    border:2px solid #550000;
+    background:#000;
+  }
+  .option.selected{
+    border-color:var(--main-blue);
+    background:#220000;
+    font-weight:600;
+    text-shadow: 0 0 5px rgba(255,0,0,0.5);
+  }
+  .option.selected::before{
+    border-color:#ff0000;
+    background:#ff0000;
+    box-shadow:inset 0 0 0 3px #000;
+  }
+  .feedback{
+    margin-top:6px;
+    font-size:12.5px;
+    line-height:1.6;
+    color:#ff6666;
+    background:#1a0000;
+    border-left:3px solid var(--main-blue);
+    padding:8px 10px;
+    border-radius:0 6px 6px 0;
+    animation:fadeIn .25s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(-4px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .submit-wrap{
+    text-align:center;
+    margin:26px 0 10px;
+  }
+  #submitBtn{
+    background:var(--main-blue);
+    color:#fff;
+    border:none;
+    padding:13px 46px;
+    font-size:15px;
+    border-radius:26px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(204,0,0,.35);
+    transition:transform .15s, background .15s;
+  }
+  #submitBtn:hover{
+    background:#ff0000;
+    transform:translateY(-1px);
+    box-shadow:0 8px 25px rgba(255,0,0,.5);
+  }
+  #submitBtn:disabled{
+    background:#330000;
+    color:#888;
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+  .unanswered-tip{
+    font-size:12px;
+    color:var(--danger);
+    margin-top:8px;
+    min-height:16px;
+  }
+
+  .modal-mask{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-mask.show{
+    display:flex;
+  }
+  .modal-box{
+    background:#111;
+    border: 1px solid #550000;
+    border-radius:16px;
+    max-width:440px;
+    width:100%;
+    max-height:86vh;
+    overflow-y:auto;
+    padding:28px 24px 22px;
+    position:relative;
+    animation:popIn .25s ease;
+    box-shadow: 0 0 30px rgba(255,0,0,0.2);
+  }
+  @keyframes popIn{
+    from{opacity:0; transform:scale(.92);}
+    to{opacity:1; transform:scale(1);}
+  }
+  .modal-box .close-x{
+    position:absolute;
+    right:16px;
+    top:14px;
+    font-size:20px;
+    color:#550000;
+    cursor:pointer;
+    line-height:1;
+  }
+  .modal-box .close-x:hover{color:#ff0000;}
+  .result-level{
+    font-size:13px;
+    color:#000;
+    display:inline-block;
+    padding:4px 12px;
+    border-radius:14px;
+    margin-bottom:14px;
+    font-weight: bold;
+  }
+  .modal-box h2{
+    margin:0 0 6px;
+    font-size:20px;
+    color: #ff0000;
+  }
+  .modal-box .score-num{
+    font-size:42px;
+    font-weight:800;
+    color:var(--danger);
+    margin:6px 0 2px;
+    text-shadow: 0 0 10px rgba(255,0,0,0.4);
+  }
+  .modal-box .score-total{
+    font-size:13px;
+    color:var(--text-grey);
+    margin-bottom:16px;
+  }
+  .modal-box .desc{
+    font-size:14px;
+    line-height:1.8;
+    color:#ffcccc;
+    background:#1a0000;
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:14px;
+    border: 1px solid #330000;
+  }
+  .modal-box .bar-outer{
+    height:10px;
+    background:#220000;
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:6px;
+  }
+  .modal-box .bar-inner{
+    height:100%;
+    background:linear-gradient(90deg,#880000,var(--danger));
+    width:0%;
+    transition:width .6s ease;
+  }
+  .cat-breakdown{
+    margin-top:16px;
+    font-size:12px;
+    color:var(--text-grey);
+  }
+  .cat-breakdown .row{
+    display:flex;
+    justify-content:space-between;
+    padding:4px 0;
+    border-bottom:1px dashed #330000;
+  }
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .modal-actions button{
+    flex:1;
+    padding:11px 0;
+    border-radius:22px;
+    border:none;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  #retestBtn{
+    background:#220000;
+    color:#ff6666;
+    border: 1px solid #550000;
+  }
+  #retestBtn:hover{background:#330000;}
+  #shareBtn{
+    background:var(--main-blue);
+    color:#fff;
+  }
+  #shareBtn:hover{background:#ff0000; box-shadow: 0 0 10px rgba(255,0,0,0.5);}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:30px;
+    transform:translateX(-50%) translateY(20px);
+    background:#ff0000;
+    color:#000;
+    font-weight: bold;
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:all .3s ease;
+    z-index:1100;
+    box-shadow: 0 0 15px rgba(255,0,0,0.5);
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  footer.note{
+    text-align:center;
+    font-size:11.5px;
+    color:#660000;
+    margin-top:26px;
+    padding:0 30px;
+    line-height:1.8;
+  }
+</style>
+</head>
+<body>
+
+<div id="progressBar"><div id="progressFill"></div></div>
+
+<header class="top">
+  <h1>🩸 掌控深渊：暗黑心理指数评估</h1>
+  <p>50道直击灵魂的残酷拷问。在极致的爱与癫狂的占有之间，你会越界多少次？不要试图欺骗自己，黑暗中的眼睛正在注视着你的每一个选择。</p>
+  <div class="meta-row">
+    <span>深渊考题 50 级</span>
+    <span id="answeredCountTop">已沉沦 0 / 50</span>
+    <span>约 8 分钟</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="nickname-card">
+    <label for="nicknameInput">代号（测试结果将铭刻此名） 👇</label>
+    <input id="nicknameInput" type="text" placeholder="输入你在黑暗中的名字..." maxlength="12"
+           oninput="onNicknameInput(this.value)">
+    <div class="live-score-tip">绝对掌控力实时波动：<b id="liveScore">0</b> / 200  <span id="liveTag">（静默中）</span></div>
+  </div>
+
+  <div id="questionList"></div>
+
+  <div class="submit-wrap">
+    <button id="submitBtn" onclick="handleSubmit()" disabled>揭开我的病态底牌</button>
+    <div class="unanswered-tip" id="unansweredTip"></div>
+  </div>
+
+  <footer class="note">
+    警告：本测试涉及极端控制、越界探寻与病娇心理模拟。<br>
+    若测试结果让你感到极度兴奋，请务必克制你在现实中的行为。爱是囚笼，但钥匙不该被吞下。
+  </footer>
+</div>
+
+<div class="modal-mask" id="resultModal">
+  <div class="modal-box">
+    <span class="close-x" onclick="closeModal()">✕</span>
+    <span class="result-level" id="resultLevelTag">—</span>
+    <h2 id="resultTitle">诊断书</h2>
+    <div class="score-num" id="resultScoreNum">0</div>
+    <div class="score-total">恶化指数 / 200，深渊完成度 <span id="resultPercent">0%</span></div>
+    <div class="bar-outer"><div class="bar-inner" id="resultBar"></div></div>
+    <div class="desc" id="resultDesc"></div>
+    <div class="cat-breakdown" id="catBreakdown"></div>
+    <div class="modal-actions">
+      <button id="retestBtn" onclick="retest()">重新伪装一次</button>
+      <button id="shareBtn" onclick="shareResult()">分享我的病历</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const QUIZ_DATA = [
+{"id": 1, "category": "日常失控", "text": "1. 没回消息时：", "options": [
+  {"text": "A. 自己玩自己的", "feedback": "心真大，我在这边想你，你却在那边玩得开心，到底还有没有我了", "score": 1},
+  {"text": "B. 疯狂刷我动态", "feedback": "看吧，你果然离不开我，盯着我呢", "score": 2},
+  {"text": "C. 怀疑我出去了", "feedback": "你倒是挺了解我，知道我不老实", "score": 3},
+  {"text": "D. 必须等我回了才敢睡", "feedback": "算你听话，知道离了我不行", "score": 4}
+]},
+{"id": 2, "category": "行踪掌控", "text": "2. 报备行程：", "options": [
+  {"text": "A. 一天一次", "feedback": "你在打发谁呢，这种频率也算爱我？", "score": 1},
+  {"text": "B. 想到的时候", "feedback": "想到才报？你心里还有没有我这个主人", "score": 2},
+  {"text": "C. 到达目的地就报", "feedback": "勉强及格，但我还是不放心", "score": 3},
+  {"text": "D. 只要离开视线就得报", "feedback": "这才像话，你的一举一动都得在我掌控里", "score": 4}
+]},
+{"id": 3, "category": "领地戒备", "text": "3. 遇到异性：", "options": [
+  {"text": "A. 无感", "feedback": "你什么意思，这种事你居然没感觉？", "score": 1},
+  {"text": "B. 看看那人是谁", "feedback": "看我怎么收拾你，敢勾搭你", "score": 2},
+  {"text": "C. 稍微有点不爽", "feedback": "吃醋是我的权利，你给我记着", "score": 3},
+  {"text": "D. 盯着看我怎么处理", "feedback": "呵，算你有眼力见，知道我才是你的正宫", "score": 4}
+]},
+{"id": 4, "category": "隐私剥夺", "text": "4. 手机相册照片：", "options": [
+  {"text": "A. 随你喜欢", "feedback": "你找打是吧？", "score": 1},
+  {"text": "B. 问是谁", "feedback": "给我个合理的解释，最好别有下次", "score": 2},
+  {"text": "C. 直接删了", "feedback": "敢留这种东西，你是想气死我吗", "score": 3},
+  {"text": "D. 手机锁死", "feedback": "以后只准看我，除了我，谁也不许进你相册", "score": 4}
+]},
+{"id": 5, "category": "社交隔离", "text": "5. 参加聚会：", "options": [
+  {"text": "A. 自己决定", "feedback": "我说了算，你敢一个人去？", "score": 1},
+  {"text": "B. 提醒注意分寸", "feedback": "算你懂事，知道该防着谁", "score": 2},
+  {"text": "C. 必须带上我", "feedback": "我会盯着你的，看哪个不长眼的敢靠近", "score": 3},
+  {"text": "D. 找借口别去", "feedback": "乖乖在家待着，哪也不许去，外面的野男人多", "score": 4}
+]},
+{"id": 6, "category": "精神烙印", "text": "6. 归属感：", "options": [
+  {"text": "A. 走在路上牵手", "feedback": "这种程度算什么，太肤浅了", "score": 1},
+  {"text": "B. 一起宅着", "feedback": "不够，我要的更多", "score": 2},
+  {"text": "C. 只对我撒娇", "feedback": "这点程度，还没到我心坎里", "score": 3},
+  {"text": "D. 眼里只能有你", "feedback": "这才是我的乖狗狗，真乖", "score": 4}
+]},
+{"id": 7, "category": "肉体规训", "text": "7. 穿衣风格：", "options": [
+  {"text": "A. 没必要", "feedback": "你想死？敢违抗我？", "score": 1},
+  {"text": "B. 偶尔听听建议", "feedback": "听我的更好看，懂吗", "score": 2},
+  {"text": "C. 必须穿我喜欢的", "feedback": "我不准的都不准穿，记住了没", "score": 3},
+  {"text": "D. 除了我谁都不准看", "feedback": "只有我能看你，其他人看一眼我都想抠了他们的眼睛", "score": 4}
+]},
+{"id": 8, "category": "领地戒备", "text": "8. 和别人聊开心：", "options": [
+  {"text": "A. 走过去加入", "feedback": "加入？把你拉走还差不多", "score": 1},
+  {"text": "B. 阴阳怪气", "feedback": "别以为我没看见，你笑得太碍眼了", "score": 2},
+  {"text": "C. 把我拉走", "feedback": "你是我的，别想跑", "score": 3},
+  {"text": "D. 让他离远点", "feedback": "让他消失，别脏了你的眼", "score": 4}
+]},
+{"id": 9, "category": "时间垄断", "text": "9. 工作忙：", "options": [
+  {"text": "A. 默默等待", "feedback": "等着？你心里到底有没有我", "score": 1},
+  {"text": "B. 发消息催我", "feedback": "催你是为了让你早点回来，不然我哪受得了", "score": 2},
+  {"text": "C. 去公司找我", "feedback": "我去接你，顺便看看你是不是在偷懒", "score": 3},
+  {"text": "D. 辞了", "feedback": "辞了，我养你还不容易，省得你在外面受委屈", "score": 4}
+]},
+{"id": 10, "category": "绝对掌控", "text": "10. 占有欲：", "options": [
+  {"text": "A. 喜欢看你粘我", "feedback": "太轻了，这点程度算什么", "score": 1},
+  {"text": "B. 密码必须是我的生日", "feedback": "这才对，你是我的专属", "score": 2},
+  {"text": "C. 生活围着我转", "feedback": "除了我，你哪有生活", "score": 3},
+  {"text": "D. 整个人都是我的", "feedback": "你是我的私人收藏，懂吗", "score": 4}
+]},
+{"id": 11, "category": "时间垄断", "text": "11. 睡前最后一件事：", "options": [
+  {"text": "A. 玩手机", "feedback": "看来你不想跟我说话", "score": 1},
+  {"text": "B. 想想计划", "feedback": "明天？明天也得想着我", "score": 2},
+  {"text": "C. 回复我消息", "feedback": "这才乖，不准带着我的不满去睡觉", "score": 3},
+  {"text": "D. 汇报行踪", "feedback": "没汇报不准睡，听见没", "score": 4}
+]},
+{"id": 12, "category": "精神洗脑", "text": "12. 新博主：", "options": [
+  {"text": "A. 看看发什么", "feedback": "你居然还想看？看来是欠收拾", "score": 1},
+  {"text": "B. 问理由", "feedback": "借口而已，别以为我不知道", "score": 2},
+  {"text": "C. 取关拉黑", "feedback": "这种事我帮你做，省得你心软", "score": 3},
+  {"text": "D. 账号收了", "feedback": "把号交出来，以后别想再动", "score": 4}
+]},
+{"id": 13, "category": "灵魂拷问", "text": "13. 真心话：", "options": [
+  {"text": "A. 爱我吗", "feedback": "哼，这还用问，你敢说不爱？", "score": 1},
+  {"text": "B. 想我吗", "feedback": "想我就对了，不然你想谁", "score": 2},
+  {"text": "C. 除了我还有别人吗", "feedback": "敢有别人你就死定了，我要把你圈禁起来", "score": 3},
+  {"text": "D. 敢背叛吗", "feedback": "呵，你敢背叛试试，我会让你后悔来到这个世界上", "score": 4}
+]},
+{"id": 14, "category": "社交隔离", "text": "14. 给异性点赞：", "options": [
+  {"text": "A. 不算", "feedback": "你胆子肥了是吧", "score": 1},
+  {"text": "B. 稍微过分", "feedback": "下次注意点，别让我再看见", "score": 2},
+  {"text": "C. 绝对不行", "feedback": "这是警告，你给我安分点", "score": 3},
+  {"text": "D. 再有一次死定了", "feedback": "再让我看见一次，你就试试，我有的是办法让你求饶", "score": 4}
+]},
+{"id": 15, "category": "时间垄断", "text": "15. 回家时间：", "options": [
+  {"text": "A. 不限制", "feedback": "你想玩到几点？是不是想在外面过夜？", "score": 1},
+  {"text": "B. 十点前", "feedback": "勉强原谅，但还是太晚了", "score": 2},
+  {"text": "C. 九点前", "feedback": "我来接你，要是敢晚一秒，你就惨了", "score": 3},
+  {"text": "D. 八点前", "feedback": "敢晚一分钟，家门都别进了", "score": 4}
+]},
+{"id": 16, "category": "情感索取", "text": "16. 安全感：", "options": [
+  {"text": "A. 信任", "feedback": "太幼稚了，你以为我信你？", "score": 1},
+  {"text": "B. 沟通", "feedback": "我只信我的手腕，只有把你锁在身边我才放心", "score": 2},
+  {"text": "C. 服从", "feedback": "这才是真理，只有服从我，你才是安全的", "score": 3},
+  {"text": "D. 离不开", "feedback": "这才对，别想离开我，你这辈子都属于我", "score": 4}
+]},
+{"id": 17, "category": "精神洗脑", "text": "17. 提前任：", "options": [
+  {"text": "A. 冷笑", "feedback": "皮痒了？提这种垃圾干什么", "score": 1},
+  {"text": "B. 警告", "feedback": "把那名字烂肚子里，听见没", "score": 2},
+  {"text": "C. 删联系方式", "feedback": "现在就删，别让我再说第二遍", "score": 3},
+  {"text": "D. 忘掉", "feedback": "我会让你彻底忘记，除了我，你脑子里不准有任何男人的影子", "score": 4}
+]},
+{"id": 18, "category": "空间侵占", "text": "18. 心情不好想独处：", "options": [
+  {"text": "A. 给空间", "feedback": "滚一边去？你当我是什么", "score": 1},
+  {"text": "B. 问怎么了", "feedback": "有事就说，别想瞒着我", "score": 2},
+  {"text": "C. 不准走", "feedback": "陪着我，我不准你一个人待着", "score": 3},
+  {"text": "D. 锁门", "feedback": "把自己锁在我身边，哪也不许去", "score": 4}
+]},
+{"id": 19, "category": "服从与规训", "text": "19. 无法忍受：", "options": [
+  {"text": "A. 不回消息", "feedback": "不回消息就是欠收拾，找打", "score": 1},
+  {"text": "B. 敷衍", "feedback": "敷衍我？看来你是不想要好日子了", "score": 2},
+  {"text": "C. 看别人", "feedback": "不准看别人，听见没有", "score": 3},
+  {"text": "D. 逃走", "feedback": "离开？你这辈子都别想跑出我的手掌心", "score": 4}
+]},
+{"id": 20, "category": "社交隔离", "text": "20. 删社交软件：", "options": [
+  {"text": "A. 拒绝", "feedback": "看来你是想找虐", "score": 1},
+  {"text": "B. 犹豫", "feedback": "别犹豫了，删了才乖", "score": 2},
+  {"text": "C. 照做", "feedback": "乖，删了才是我的人", "score": 3},
+  {"text": "D. 上交账号", "feedback": "账号给我，以后你用我给的，我让你看谁你才能看谁", "score": 4}
+]},
+{"id": 21, "category": "隐私剥夺", "text": "21. 秘密：", "options": [
+  {"text": "A. 每个人都需要", "feedback": "你想瞒我什么？说实话", "score": 1},
+  {"text": "B. 尽量少一点", "feedback": "最好一点都没有", "score": 2},
+  {"text": "C. 没必要", "feedback": "你的一切都是我的", "score": 3},
+  {"text": "D. 公开", "feedback": "我必须掌握你的一切，你别想有事瞒着我", "score": 4}
+]},
+{"id": 22, "category": "精神洗脑", "text": "22. 评价别人：", "options": [
+  {"text": "A. 没反应", "feedback": "看来你是皮痒了", "score": 1},
+  {"text": "B. 提醒别被骗", "feedback": "别乱夸，除了我，谁值得你夸？", "score": 2},
+  {"text": "C. 不准说别人", "feedback": "别说别人，我不爱听", "score": 3},
+  {"text": "D. 只准夸我", "feedback": "除了我，谁都不许夸，你只能是我的小粉丝", "score": 4}
+]},
+{"id": 23, "category": "惩罚与威慑", "text": "23. 不听话：", "options": [
+  {"text": "A. 冷战", "feedback": "冷战？你试试，看我怎么整治你", "score": 1},
+  {"text": "B. 讲道理", "feedback": "别跟我讲道理，我是你主人", "score": 2},
+  {"text": "C. 后果", "feedback": "我会让你知道后果的，别指望我会心软", "score": 3},
+  {"text": "D. 惩罚", "feedback": "乖乖求饶才是你该做的，跪着认错", "score": 4}
+]},
+{"id": 24, "category": "社交隔离", "text": "24. 离你远点：", "options": [
+  {"text": "A. 不认识的人", "feedback": "那还不够，所有人都得远点", "score": 1},
+  {"text": "B. 异性朋友", "feedback": "把他们全删了，一个不留", "score": 2},
+  {"text": "C. 除了我以外所有人", "feedback": "除了我，谁都别接近你，否则我会让他们消失", "score": 3},
+  {"text": "D. 亲手清理", "feedback": "我会清理干净，你只准看我", "score": 4}
+]},
+{"id": 25, "category": "领地戒备", "text": "25. 被搭讪：", "options": [
+  {"text": "A. 礼貌拒绝", "feedback": "拒绝？你还想留余地？", "score": 1},
+  {"text": "B. 告诉有我", "feedback": "不够，我要让他们知道你是我的所有物", "score": 2},
+  {"text": "C. 当场难堪", "feedback": "我让他知道什么叫自讨苦吃", "score": 3},
+  {"text": "D. 带标记", "feedback": "出门带上我的印记，省得那些烂桃花惦记你", "score": 4}
+]},
+{"id": 26, "category": "服从与规训", "text": "26. 面对占有欲：", "options": [
+  {"text": "A. 理解", "feedback": "还不够，这点理解算什么", "score": 1},
+  {"text": "B. 安慰", "feedback": "安慰？不如服从我来得直接", "score": 2},
+  {"text": "C. 顺从", "feedback": "乖，这样才是我心里的那个你", "score": 3},
+  {"text": "D. 跪着认错", "feedback": "跪好，这是你应该的，别想反抗", "score": 4}
+]},
+{"id": 27, "category": "肉体与标记", "text": "27. 外人面前：", "options": [
+  {"text": "A. 普通情侣", "feedback": "太疏远了，我不喜欢", "score": 1},
+  {"text": "B. 亲密恋人", "feedback": "稍微有点意思", "score": 2},
+  {"text": "C. 宣告所有权", "feedback": "好主意，我要让所有人都知道你是我的", "score": 3},
+  {"text": "D. 染上气味", "feedback": "让你染上我的味道，省得别人惦记，你是属于我的", "score": 4}
+]},
+{"id": 28, "category": "惩罚与威慑", "text": "28. 反抗：", "options": [
+  {"text": "A. 软磨硬泡", "feedback": "软磨硬泡？我没那么好心", "score": 1},
+  {"text": "B. 警告", "feedback": "这是最后一次，下次就没这么好说话了", "score": 2},
+  {"text": "C. 锁家里", "feedback": "锁起来最安全，你哪也别想去", "score": 3},
+  {"text": "D. 离不开", "feedback": "永远离不开，听懂了没？你这辈子都是我的", "score": 4}
+]},
+{"id": 29, "category": "依附与共生", "text": "29. 依赖减少：", "options": [
+  {"text": "A. 心事", "feedback": "想什么呢？是不是心野了？", "score": 1},
+  {"text": "B. 更粘", "feedback": "看来得更粘点，让你离不开我", "score": 2},
+  {"text": "C. 补偿", "feedback": "补偿？我要你全部的时间和身体", "score": 3},
+  {"text": "D. 摧毁独立", "feedback": "剥夺你的独立，你只需要依赖我，这才是你该有的样子", "score": 4}
+]},
+{"id": 30, "category": "服从与规训", "text": "30. 最乖样子：", "options": [
+  {"text": "A. 撒娇", "feedback": "太浅了，我要你全身心臣服", "score": 1},
+  {"text": "B. 听话", "feedback": "听话就好，这样才乖", "score": 2},
+  {"text": "C. 抱紧", "feedback": "抱紧点，别想松开", "score": 3},
+  {"text": "D. 傀儡", "feedback": "像我怀里的小傀儡，真好，我就喜欢看你只听我的", "score": 4}
+]},
+{"id": 31, "category": "惩罚与威慑", "text": "31. 表情：", "options": [
+  {"text": "A. 笑", "feedback": "笑太假了，我不喜欢", "score": 1},
+  {"text": "B. 生气", "feedback": "生气也可爱，但我更喜欢你顺从", "score": 2},
+  {"text": "C. 害羞", "feedback": "害羞才好玩，真想看看你被我欺负的样子", "score": 3},
+  {"text": "D. 欺负到哭", "feedback": "被我欺负哭最动人了，这时候的你最听话", "score": 4}
+]},
+{"id": 32, "category": "空间侵占", "text": "32. 旅行：", "options": [
+  {"text": "A. 祝开心", "feedback": "想得美，我怎么可能放你一个人去？", "score": 1},
+  {"text": "B. 策划", "feedback": "跟我去，别想跑", "score": 2},
+  {"text": "C. 陪去", "feedback": "必须陪我，你想去哪都得带着我", "score": 3},
+  {"text": "D. 没我批准", "feedback": "哪也不准去，你是我的，别想离开我的视线", "score": 4}
+]},
+{"id": 33, "category": "绝对掌控", "text": "33. 自由：", "options": [
+  {"text": "A. 爱我", "feedback": "这还不够，我要你彻底属于我", "score": 1},
+  {"text": "B. 允许", "feedback": "我的范围才是你的自由，你以为你有别的选择？", "score": 2},
+  {"text": "C. 我身边", "feedback": "我身边才是安全屋，离开我就没有自由", "score": 3},
+  {"text": "D. 命和身心", "feedback": "你的命都属于我，别想反抗", "score": 4}
+]},
+{"id": 34, "category": "绝对掌控", "text": "34. 私房钱：", "options": [
+  {"text": "A. 调侃", "feedback": "想跑？你以为你藏得住？", "score": 1},
+  {"text": "B. 问干嘛", "feedback": "坦白从宽，别跟我耍花招", "score": 2},
+  {"text": "C. 没收", "feedback": "没收，你不需要钱", "score": 3},
+  {"text": "D. 管理", "feedback": "你的账目，必须由我管理，你的一切都在我掌控中", "score": 4}
+]},
+{"id": 35, "category": "惩罚与威慑", "text": "35. 发脾气：", "options": [
+  {"text": "A. 哄你", "feedback": "哄你？你以为我是谁？", "score": 1},
+  {"text": "B. 怼回去", "feedback": "怼我？看来你是不想要好日子了", "score": 2},
+  {"text": "C. 盯着你看", "feedback": "看你心虚的样子真好玩，你也就敢跟我横", "score": 3},
+  {"text": "D. 主人", "feedback": "这才是该有的样子，乖乖听我的话就行了", "score": 4}
+]},
+{"id": 36, "category": "依附与共生", "text": "36. 离不开：", "options": [
+  {"text": "A. 不知道", "feedback": "那是你还没试过，试试你就知道了", "score": 1},
+  {"text": "B. 希望", "feedback": "不，这不是希望，这是必然", "score": 2},
+  {"text": "C. 绝对离不开", "feedback": "这才是现实，除了我，你谁也依靠不了", "score": 3},
+  {"text": "D. 永远无法离开", "feedback": "我会让你彻底离不开我，这辈子你都别想逃", "score": 4}
+]},
+{"id": 37, "category": "肉体与标记", "text": "37. 肢体接触：", "options": [
+  {"text": "A. 没看见", "feedback": "我可是记着呢，下次别让我看见", "score": 1},
+  {"text": "B. 不舒服", "feedback": "很不爽，你是我的，怎么能让别人碰？", "score": 2},
+  {"text": "C. 难看", "feedback": "我会让你以后都不敢，让他知道什么是后果", "score": 3},
+  {"text": "D. 废了", "feedback": "那只手别想要了，敢碰我的人，找死", "score": 4}
+]},
+{"id": 38, "category": "肉体与标记", "text": "38. 气息覆盖：", "options": [
+  {"text": "A. 衣服", "feedback": "衣服？不够，太少了", "score": 1},
+  {"text": "B. 身上", "feedback": "身上？稍微好点，但还是不够", "score": 2},
+  {"text": "C. 环境", "feedback": "不够，太浅了", "score": 3},
+  {"text": "D. 每一寸", "feedback": "每一寸，都是我的，别想有谁能碰到你", "score": 4}
+]},
+{"id": 39, "category": "惩罚与威慑", "text": "39. 做错事：", "options": [
+  {"text": "A. 道歉", "feedback": "太轻了，这点道歉没用", "score": 1},
+  {"text": "B. 补偿", "feedback": "补偿？勉强可以，但还要更多", "score": 2},
+  {"text": "C. 跪着", "feedback": "乖，这才是认错的态度", "score": 3},
+  {"text": "D. 长记性", "feedback": "让你知道痛，长记性，以后才不敢再犯", "score": 4}
+]},
+{"id": 40, "category": "极端与毁灭", "text": "40. 归宿：", "options": [
+  {"text": "A. 身边", "feedback": "身边？不够，太远了", "score": 1},
+  {"text": "B. 怀里", "feedback": "还差点，我要你彻底融入我", "score": 2},
+  {"text": "C. 笼子", "feedback": "这才安全，你就乖乖待在里面吧", "score": 3},
+  {"text": "D. 吞噬", "feedback": "吞噬，你这辈子都是我的，谁也抢不走", "score": 4}
+]},
+{"id": 41, "category": "社交隔离", "text": "41. 新社交：", "options": [
+  {"text": "A. 支持", "feedback": "想多了，你以为我傻？", "score": 1},
+  {"text": "B. 谨慎", "feedback": "看来是欠教训，居然还想结交别人？", "score": 2},
+  {"text": "C. 审核", "feedback": "必须审核，谁也不准越过我", "score": 3},
+  {"text": "D. 让他消失", "feedback": "靠近你的，我会让他们通通消失，这世界不需要第三个人", "score": 4}
+]},
+{"id": 42, "category": "时间垄断", "text": "42. 时间分配：", "options": [
+  {"text": "A. 随你", "feedback": "不可能，你是我的人", "score": 1},
+  {"text": "B. 不够", "feedback": "当然不够，你的时间全是我的", "score": 2},
+  {"text": "C. 全部属于我", "feedback": "这才对，你的一切都属于我", "score": 3},
+  {"text": "D. 预定", "feedback": "你的一分一秒都被我预定了，别想有一秒属于别人", "score": 4}
+]},
+{"id": 43, "category": "肉体规训", "text": "43. 想要时：", "options": [
+  {"text": "A. 考虑", "feedback": "没得选，这种时候你只能配合", "score": 1},
+  {"text": "B. 答应", "feedback": "必须答应，这是你的责任", "score": 2},
+  {"text": "C. 主动", "feedback": "主动点才乖，省得我动手", "score": 3},
+  {"text": "D. 服从", "feedback": "别管你在干嘛，过来，我让你干嘛你就干嘛", "score": 4}
+]},
+{"id": 44, "category": "极端与毁灭", "text": "44. 深沉的爱：", "options": [
+  {"text": "A. 照顾", "feedback": "照顾？这太普通了", "score": 1},
+  {"text": "B. 宠", "feedback": "这叫什么爱？太肤浅", "score": 2},
+  {"text": "C. 囚禁", "feedback": "囚禁才是永恒，这样你就永远属于我了", "score": 3},
+  {"text": "D. 毁掉", "feedback": "毁了你，你才能永远属于我，你是我的专属，谁也不许染指", "score": 4}
+]},
+{"id": 45, "category": "隐私剥夺", "text": "45. 看手机：", "options": [
+  {"text": "A. 随便", "feedback": "你在想什么？我是你主人", "score": 1},
+  {"text": "B. 检查", "feedback": "看来你还不懂谁才是这里的主人", "score": 2},
+  {"text": "C. 我必须在场", "feedback": "我不准你一个人看，谁知道你在看什么", "score": 3},
+  {"text": "D. 没资格", "feedback": "那是我的东西，你没资格碰，把你自己的手机上交", "score": 4}
+]},
+{"id": 46, "category": "精神洗脑", "text": "46. 控制方式：", "options": [
+  {"text": "A. 物质", "feedback": "太幼稚了", "score": 1},
+  {"text": "B. 感情", "feedback": "感情？太脆弱了", "score": 2},
+  {"text": "C. 身体", "feedback": "这只是开始", "score": 3},
+  {"text": "D. 崩溃", "feedback": "只有让你彻底精神崩溃，你眼里就只有我了，这才是最完美的控制", "score": 4}
+]},
+{"id": 47, "category": "极端与毁灭", "text": "47. 抢走你：", "options": [
+  {"text": "A. 争论", "feedback": "太掉价了，我从不争论", "score": 1},
+  {"text": "B. 选择", "feedback": "我只要结果，你别想选别人", "score": 2},
+  {"text": "C. 消失", "feedback": "让他彻底消失，谁敢惦记你，我就让他付出代价", "score": 3},
+  {"text": "D. 手段", "feedback": "无论手段，你只能是我的，哪怕用尽一切，你也要陪在我身边", "score": 4}
+]},
+{"id": 48, "category": "极端与毁灭", "text": "48. 关系：", "options": [
+  {"text": "A. 恩爱", "feedback": "太普通了，我不要", "score": 1},
+  {"text": "B. 灵魂", "feedback": "太虚了，我不信", "score": 2},
+  {"text": "C. 主从", "feedback": "这才是最稳固的，你只需要听我的", "score": 3},
+  {"text": "D. 影子", "feedback": "这辈子都别想甩开我，你就是我的附属品", "score": 4}
+]},
+{"id": 49, "category": "极端与毁灭", "text": "49. 预期：", "options": [
+  {"text": "A. 天长地久", "feedback": "这不够", "score": 1},
+  {"text": "B. 不离不弃", "feedback": "这是必须的", "score": 2},
+  {"text": "C. 死也要在一起", "feedback": "当然，你死也是我的鬼", "score": 3},
+  {"text": "D. 困在视线", "feedback": "永远困在我的视线里，这就是你的命，别想逃", "score": 4}
+]},
+{"id": 50, "category": "极端与毁灭", "text": "50. 真的离开：", "options": [
+  {"text": "A. 放手", "feedback": "你做梦，这辈子你都别想离开我", "score": 1},
+  {"text": "B. 挽留", "feedback": "我不挽留，我直接动手", "score": 2},
+  {"text": "C. 打断腿", "feedback": "打断腿也得留下，你只能待在我身边", "score": 3},
+  {"text": "D. 标本", "feedback": "标本才永远不会背叛，这才是最好的你，如果你真敢走，我就让你永远留在我身边做成标本 ^ ^", "score": 4}
+]}
+];
+
+const CAT_TOOLTIP = {
+  "日常失控": "对日常联系失控时的焦虑反应。",
+  "行踪掌控": "对TA坐标轨迹的绝对监控欲。",
+  "领地戒备": "警惕一切试图靠近领地的生物。",
+  "隐私剥夺": "粉碎界限，你的秘密必须向我全裸。",
+  "社交隔离": "用剪刀剪断TA与外界的所有连线。",
+  "精神烙印": "试图在TA灵魂深处刻下从属印记。",
+  "肉体规训": "将TA物化、装扮与支配的渴望。",
+  "时间垄断": "日历上的每一秒都必须写着我的名字。",
+  "绝对掌控": "权力的全面覆盖，不留一丝死角。",
+  "精神洗脑": "修改TA的认知，让TA只能仰望你。",
+  "灵魂拷问": "试图看透伪装直击软肋的偏执。",
+  "情感索取": "无底洞般榨取确认感与存在感。",
+  "空间侵占": "哪怕是呼吸的空气也不允许独享。",
+  "服从与规训": "把平等的爱扭曲为绝对的从属协议。",
+  "惩罚与威慑": "以痛觉建立统治的施虐法则。",
+  "肉体与标记": "用气味、痕迹等动物本能宣示私有权。",
+  "依附与共生": "打断骨头连着筋的病态互相寄生。",
+  "极端与毁灭": "得不到就彻底粉碎，死亡才是永恒。"
+};
+
+const LEVELS = [
+  { max: 74,  tag: "清醒路人", color: "#666666",
+    title: "理智边界守卫者",
+    desc: "你的分数低得不像来做这个测试的。在你的世界里，爱是自由意志的沉沦，而不是互相捆绑的铁链。你极度尊重对方的隐私和自由，甚至有时候理智得让人觉得有点冷血。保持这种松弛感，但偶尔也可以假装吃点醋，给平淡的生活加点戏。" },
+  { max: 124, tag: "微酸玩家", color: "#aa0000",
+    title: "隐忍的吃醋机器",
+    desc: "你心里住着一头想要霸占对方的小野兽，但你用成人的体面把它锁在了笼子里。你会在意TA看了谁、去了哪，但大多数时候只是自己生闷气或暗搓搓地试探。你的控制欲还在安全线内，只是内耗有点严重，试着直接把需求吼出来吧。" },
+  { max: 164, tag: "危险分子", color: "#ff3333",
+    title: "高压控制狂雏形",
+    desc: "警告！你的占有欲已经开始发烂发臭。你需要掌控对方的密码、行踪甚至是呼吸频率才能感到安心。你的爱像是一张越收越紧的网，TA稍微挣扎一下你就会如临大敌。你正在把伴侣逼向窒息的边缘，如果不学会放权，这场关系终将以爆炸收场。" },
+  { max: 9999, tag: "深渊病娇", color: "#ff0000",
+    title: "不可救药的病态囚徒",
+    desc: "警报拉响！你根本不是在寻找伴侣，你是在寻找一个任你摆布的木偶、一个被拔掉牙齿关在笼子里的宠物。你的选项里充满了毁灭、囚禁和极端的自私。对你来说，如果不能百分之百占有，那就连同世界一起毁掉。这份爱太沉重，重到带着血腥味。请立刻反思自己，或挂号精神科。" }
+];
+
+const answers = {};
+let nickname = "";
+
+function renderQuestions(){
+  const list = document.getElementById("questionList");
+  list.innerHTML = "";
+
+  QUIZ_DATA.forEach(q => {
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard-" + q.id;
+
+    const tag = document.createElement("span");
+    tag.className = "cat-tag";
+    tag.textContent = q.category;
+    tag.addEventListener("mouseenter", function(){
+      let tip = tag.querySelector(".tooltip");
+      if(!tip){
+        tip = document.createElement("div");
+        tip.className = "tooltip";
+        tip.textContent = CAT_TOOLTIP[q.category] || "病态掌控的一个切面。";
+        tag.appendChild(tip);
+      }
+      tip.style.display = "block";
+    });
+    tag.addEventListener("mouseleave", function(){
+      const tip = tag.querySelector(".tooltip");
+      if(tip) tip.style.display = "none";
+    });
+    card.appendChild(tag);
+
+    const qText = document.createElement("div");
+    qText.className = "q-text";
+    qText.textContent = q.text;
+    card.appendChild(qText);
+
+    const optWrap = document.createElement("div");
+    optWrap.className = "options";
+
+    q.options.forEach((opt, idx) => {
+      const optDiv = document.createElement("div");
+      optDiv.className = "option";
+      optDiv.textContent = opt.text;
+      optDiv.setAttribute("onclick", `selectOption(${q.id}, ${idx})`);
+      optDiv.id = `opt-${q.id}-${idx}`;
+      optWrap.appendChild(optDiv);
+
+      const fbDiv = document.createElement("div");
+      fbDiv.className = "feedback";
+      fbDiv.id = `fb-${q.id}-${idx}`;
+      fbDiv.style.display = "none";
+      fbDiv.textContent = "🩸 " + opt.feedback;
+      optWrap.appendChild(fbDiv);
+    });
+
+    card.appendChild(optWrap);
+    list.appendChild(card);
+  });
+}
+
+function selectOption(qid, optIdx){
+  const q = QUIZ_DATA.find(x => x.id === qid);
+  const opt = q.options[optIdx];
+
+  q.options.forEach((o, i) => {
+    document.getElementById(`opt-${qid}-${i}`).classList.remove("selected");
+    document.getElementById(`fb-${qid}-${i}`).style.display = "none";
+  });
+
+  document.getElementById(`opt-${qid}-${optIdx}`).classList.add("selected");
+  document.getElementById(`fb-${qid}-${optIdx}`).style.display = "block";
+  document.getElementById(`qcard-${qid}`).classList.add("answered");
+
+  answers[qid] = { score: opt.score, optionIndex: optIdx };
+  updateProgress();
+}
+
+function updateProgress(){
+  const answeredCount = Object.keys(answers).length;
+  const total = QUIZ_DATA.length;
+  const pct = Math.round((answeredCount / total) * 100);
+
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("answeredCountTop").textContent = `已沉沦 ${answeredCount} / ${total}`;
+
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = answeredCount < total;
+
+  let sum = 0;
+  Object.values(answers).forEach(a => sum += a.score);
+  document.getElementById("liveScore").textContent = sum;
+
+  const liveTag = document.getElementById("liveTag");
+  if(answeredCount === 0){
+    liveTag.textContent = "（静默中）";
+    liveTag.style.color = "#888";
+  } else {
+    const level = getLevel(sum);
+    liveTag.textContent = `（病变趋势：${level.tag}）`;
+    liveTag.style.color = level.color;
+  }
+
+  if(answeredCount === total){
+    document.getElementById("unansweredTip").textContent = "";
+  }
+}
+
+function onNicknameInput(val){
+  nickname = val.trim();
+}
+
+function getLevel(score){
+  return LEVELS.find(l => score <= l.max);
+}
+
+function handleSubmit(){
+  const total = QUIZ_DATA.length;
+  const answeredCount = Object.keys(answers).length;
+
+  if(answeredCount < total){
+    const tip = document.getElementById("unansweredTip");
+    tip.textContent = `深渊未满，还差 ${total - answeredCount} 题，别想逃跑。`;
+    const firstUnanswered = QUIZ_DATA.find(q => !answers[q.id]);
+    if(firstUnanswered){
+      document.getElementById("qcard-" + firstUnanswered.id).scrollIntoView({behavior:"smooth", block:"center"});
+    }
+    return;
+  }
+
+  let sum = 0;
+  const catScores = {};
+  QUIZ_DATA.forEach(q => {
+    const a = answers[q.id];
+    sum += a.score;
+    catScores[q.category] = (catScores[q.category] || 0) + a.score;
+  });
+
+  const level = getLevel(sum);
+  const pct = Math.round((sum / 200) * 100);
+
+  const nameShow = nickname ? nickname : "代号X";
+  document.getElementById("resultLevelTag").textContent = level.tag;
+  document.getElementById("resultLevelTag").style.background = level.color;
+  document.getElementById("resultLevelTag").style.color = "#fff";
+  document.getElementById("resultTitle").textContent = `[${nameShow}] 的最终诊断：${level.title}`;
+  document.getElementById("resultScoreNum").textContent = sum;
+  document.getElementById("resultPercent").textContent = pct + "%";
+  document.getElementById("resultDesc").textContent = level.desc;
+
+  const breakdown = document.getElementById("catBreakdown");
+  breakdown.innerHTML = "<div style='margin-bottom:6px;font-weight:600;color:#ff3333;'>各病态维度得分（分数越高越危险）</div>";
+  Object.keys(catScores).forEach(cat => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<span>${cat}</span><span style="color:#ff0000;font-weight:bold;">${catScores[cat]}</span>`;
+    breakdown.appendChild(row);
+  });
+
+  const modal = document.getElementById("resultModal");
+  modal.classList.add("show");
+
+  const bar = document.getElementById("resultBar");
+  bar.style.width = "0%";
+  setTimeout(() => { bar.style.width = pct + "%"; }, 80);
+}
+
+function closeModal(){
+  document.getElementById("resultModal").classList.remove("show");
+}
+
+function retest(){
+  for(const k in answers) delete answers[k];
+  closeModal();
+  renderQuestions();
+  updateProgress();
+  document.getElementById("unansweredTip").textContent = "";
+  window.scrollTo({top:0, behavior:"smooth"});
+  showToast("记忆已重置，欢迎回到深渊。");
+}
+
+function shareResult(){
+  const sum = document.getElementById("resultScoreNum").textContent;
+  const title = document.getElementById("resultTitle").textContent;
+  const text = `【掌控深渊测试】${title}，病变指数 ${sum}/200。嘘，谁是被我锁在地下室的人？`;
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("诊断书已复制，去找你的猎物吧。");
+    }).catch(() => {
+      showToast("系统阻断了你的复制，请手动截图。");
+    });
+  } else {
+    showToast("当前环境不支持自动复制，请手动截图。");
+  }
+}
+
+function showToast(msg){
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  renderQuestions();
+  updateProgress();
+
+  document.getElementById("resultModal").addEventListener("click", function(e){
+    if(e.target === this) closeModal();
+  });
+});
+</script>
+</body>
+</html>
